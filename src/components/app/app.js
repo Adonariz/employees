@@ -14,9 +14,9 @@ class App extends Component {
 
     this.state = {
       data: [
-        {name: 'Adam S.', salary: 400, increase: false, id: 1},
-        {name: 'John C.', salary: 500, increase: true, id: 2},
-        {name: 'Peter P.', salary: 600, increase: false, id: 3},
+        {name: 'Adam S.', salary: 400, increase: false, raise: true, id: 1},
+        {name: 'John C.', salary: 500, increase: true, raise: false, id: 2},
+        {name: 'Peter P.', salary: 600, increase: false, raise: false, id: 3},
       ]
     }
     this.maxId = 4;
@@ -42,6 +42,7 @@ class App extends Component {
       name,
       salary,
       increase: false,
+      raise: false,
       id: this.maxId++
     }
 
@@ -51,13 +52,43 @@ class App extends Component {
       return {
         data: newArr
       }
-    })
+    });
+  }
+
+  onToggleProp = (id, prop) => {
+    // this.setState(({data}) => {
+    //   const index = data.findIndex(elem => elem.id === id); // находим индекс элемента
+
+    //   const old = data[index]; // старый элемент
+    //   const newItem = {...old, increase: !old.increase}; // новый элемент (элементы после спред оператора заменяют развернутые)
+    //   const newArr = [...data.slice(0, index), newItem, ...data.slice(index + 1)] // формируем новый массив
+
+    //   return {
+    //     data: newArr
+    //   }
+    // });
+
+    this.setState(({data}) => ({
+      data: data.map(item => {
+        if (item.id === id) {
+          return {...item, [prop]: !item[prop]}
+        }
+
+        return item;
+      })
+    }));
   }
 
   render() {
+    const employees = this.state.data.length;
+    const increased = this.state.data.filter(item => item.increase).length;
+
     return (
       <div className='app'>
-        <AppInfo/>
+        <AppInfo 
+            employees={employees}
+            increased={increased}  
+            />
   
         <div className="search-panel">
           <SearchPanel/>
@@ -67,10 +98,9 @@ class App extends Component {
         <EmployeesList 
             data={this.state.data}
             onDelete={this.deleteItem}
-            onAdd={this.addItem}
+            onToggleProp={this.onToggleProp}
             />
         <EmployeesAddForm
-            data={this.state.data}
             onAdd={this.addItem}
         />
       </div>
